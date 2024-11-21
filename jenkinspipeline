@@ -1,0 +1,51 @@
+pipeline {
+    agent any 
+    
+    stages { 
+        stage('SCM Checkout') {
+            steps{
+                git branch: 'main', url: 'https://github.com/hy3350233/himanshurepo2.git'
+            }
+        }
+
+        // Run Sonarqube Test
+        stage('Run Sonarqube') {
+            environment {
+                scannerHome = tool 'sonarqubescanner';
+            }
+            steps {
+                withSonarQubeEnv(credentialsId: 'sonar-token', installationName: 'sonarqubeserver') {
+                    sh """
+                        ${scannerHome}/bin/sonar-scanner -X \
+                        -Dsonar.projectKey=my_project1 \
+                        -Dsonar.projectName="My Project1"  \
+                        -Dsonar.projectVersion=1.0 \
+                        -Dsonar.sources=src \
+                        -Dsonar.exclusions=**/*.java \
+                        -Dsonar.host.url=http://43.205.96.211:9000 
+                    """     
+                }
+            }
+        }
+
+        // Copy Code to Another EC2 Machine
+        stage('Deploy to EC2') {
+            steps {
+                script {
+                    // Define the target EC2 machine and path
+                    def targetHost = "ec2-user@3.110.213.112"
+                    def targetPath = "/var/www/html"
+
+                     // Use Jenkins credentials (SSH private key)
+                    sshagent(['ssh-key']) {
+                        // SCP to copy files to the EC2 instance
+                        sh """
+                            scp -o StrictHostKeyChecking=no -r * ${targetHost}:${targetPath}
+                        """
+                    }
+                }
+            }
+        }
+    }
+}    
+
