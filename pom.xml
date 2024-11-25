@@ -71,18 +71,6 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>2.14</version>
 			</plugin>
-<build>
-    <plugins>
-        <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-            <version>2.7.3</version> <!-- Ensure this is compatible with your project -->
-        </plugin>
-    </plugins>
-</build>
-
-
-			
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
